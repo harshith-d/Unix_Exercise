@@ -1,0 +1,8 @@
+##1.c) Print the hour with the highest request count, along with the count
+
+##Script
+
+awk '{ request_count[substr($4, 14, 2)] += 1 }
+END { for(hour in request_count) print "(", hour, ", ", request_count[hour], ")" }' test.log | sort +3nr | head -1
+
+
