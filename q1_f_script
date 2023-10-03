@@ -1,0 +1,10 @@
+##1.f) Print the mean and mode of the distribution of number of GET params
+
+##Script(mean)
+
+grep GET test.log | awk '{ print $7 }' | grep "?" | sed 's/\/.*?//' | awk -F '[&]' '{ print NF }' | awk '{ sum = sum + $1; } END { print "mean = ", sum / NR }'
+
+##Script(mode)
+
+grep GET test.log | awk '{ print $7 }' | grep "?" | sed 's/\/.*?//' | awk -F '[&]' '{ print NF }' | sort | uniq -c | sort -nr | head -1 | awk '{ print "mode = ", $2 }'
+
