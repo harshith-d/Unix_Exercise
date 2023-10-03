@@ -1,0 +1,8 @@
+##1.b) Print (HTTP-status-code, count) tuples, sorted by count
+
+##Script
+
+awk '{ status_count[$9] += 1 }
+END { for(status_code in status_count) print "(", status_code, ", ", status_count[status_code], ")" }' test.log | sort +3nr
+
+
