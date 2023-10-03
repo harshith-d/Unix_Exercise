@@ -1,0 +1,8 @@
+##1.d) Print the hour with the highest total number of bytes served, along with the total
+
+##Script
+
+awk '{ total_byte[substr($4, 14, 2)] += $10 }
+END { for(hour in total_byte) print "(", hour, ", ", total_byte[hour], ")" }' test.log | sort +3nr | head -1
+
+
