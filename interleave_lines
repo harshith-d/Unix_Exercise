@@ -1,0 +1,31 @@
+##2. Implement a shell script that interleaves non-blank lines from each of its input text files.
+
+case "$#" in
+        0|1|2)  echo 'Usage : interleave_lines n file1 file2 [ file3 ... ]' 1>&2; exit 1 ;;
+esac
+
+n="$1"
+shift
+
+for file in "$@"
+do
+        if [ ! -f $file ]
+        then
+                echo "File '$file' does not exist"
+                exit 1
+        fi  
+done
+
+paste_command=""
+
+for file in "$@"; do
+    awk 'NF' $file | awk -v val="$n" '{ORS=(NR%val==0)?"\n":" dfhi54y4uc98u49q ";}1'  > "temp_$file"
+    paste_command+=" temp_$file"
+done
+
+paste -d '\n' $paste_command | sed 's/ dfhi54y4uc98u49q /\n/g' | awk 'NF'
+
+for file in "$@"
+do
+    rm "temp_$file"
+done
