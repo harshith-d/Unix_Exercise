@@ -1,0 +1,14 @@
+
+
+line 1 of b
+     line 2 of b
+
+
+line 3 of b
+ 
+line 4 of b
+
+
+line 5 of b
+		line 6 of b
+line 7 of b

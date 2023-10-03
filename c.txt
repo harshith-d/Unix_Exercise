@@ -1,0 +1,20 @@
+line 1 of c
+	line 2 of c
+
+
+line 3 of c
+
+		line 4 of c
+
+
+line 5 of c
+
+line 6 of c
+
+
+line 7 of c
+
+line 8 of c
+
+
+line 9 of c

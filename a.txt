@@ -1,0 +1,16 @@
+line 1 file a
+
+
+
+	line 2 file a
+
+
+
+line 3 file a
+
+
+
+		line 4 file a
+
+
+line 5 file a
