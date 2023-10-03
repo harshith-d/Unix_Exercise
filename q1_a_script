@@ -1,0 +1,6 @@
+##1.a) Print (host, request-count) tuples for the top-10 frequent hosts
+
+##Script
+
+awk '{ request_count[$1] += 1 }
+END { for(host in request_count) print "(", host, ", ", request_count[host], ")" }' test.log | sort +3nr | head -10

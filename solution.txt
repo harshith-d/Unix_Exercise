@@ -1,0 +1,277 @@
+1. For a http web server access log file - write an awk / awk+shell script that does the following, across all the requests in the log:
+
+1.a) Print (host, request-count) tuples for the top-10 frequent hosts
+
+##Script
+
+awk '{ request_count[$1] += 1 }
+END { for(host in request_count) print "(", host, ", ", request_count[host], ")" }' http.log | sort +3nr | head -10
+
+##Output
+
+( 193.106.31.130 ,  47690 )
+( 173.255.176.5 ,  5220 )
+( 178.44.47.170 ,  2824 )
+( 51.210.183.78 ,  2684 )
+( 45.15.143.155 ,  1927 )
+( 45.144.0.179 ,  946 )
+( 176.222.58.254 ,  934 )
+( 45.132.207.154 ,  890 )
+( 45.153.227.55 ,  888 )
+( 45.138.4.22 ,  880 )
+
+
+
+
+
+1.b) Print (HTTP-status-code, count) tuples, sorted by count 
+
+##Script
+
+awk '{ status_count[$9] += 1 }
+END { for(status_code in status_count) print "(", status_code, ", ", status_count[status_code], ")" }' http.log | sort +3nr 
+
+##Output
+
+( 200 ,  92369 )
+( 404 ,  5828 )
+( 206 ,  3102 )
+( 303 ,  1858 )
+( 301 ,  965 )
+( 304 ,  136 )
+( 403 ,  64 )
+( 400 ,  1 )
+( 405 ,  1 )
+( 500 ,  1 )
+
+
+
+
+
+1.c) Print the hour with the highest request count, along with the count
+
+##Script
+
+awk '{ request_count[substr($4, 14, 2)] += 1 }
+END { for(hour in request_count) print "(", hour, ", ", request_count[hour], ")" }' http.log | sort +3nr | head -1      
+
+##Output
+
+( 19 ,  8022 )
+
+
+
+
+
+1.d) Print the hour with the highest total number of bytes served, along with the total
+
+##Script
+
+awk '{ total_byte[substr($4, 14, 2)] += $10 }
+END { for(hour in total_byte) print "(", hour, ", ", total_byte[hour], ")" }' http.log | sort +3nr | head -1
+
+##Output
+
+( 18 ,  3896999809 )
+
+
+
+
+
+1.e) Print the first & last path name components of top-10 most frequently accessed resources
+
+##Script
+
+awk '{ print $7 }' access.log | grep "/.*/.*" | sed 's/?.*//' | awk -F/ '{print $0,$2,$NF}' | sort | uniq -c | sort -rn | head -n 10 | awk '{print "\nPath : ",$2 , "\nFirst path component : ", $3, "\nLast path component : ", $4}'
+
+##Output
+
+Path :  /apache-log/access.log 
+First path component :  apache-log 
+Last path component :  access.log
+
+Path :  /templates/_system/css/general.css 
+First path component :  templates 
+Last path component :  general.css
+
+Path :  /templates/jp_hotel/js/moomenu.js 
+First path component :  templates 
+Last path component :  moomenu.js
+
+Path :  /templates/jp_hotel/images/module_heading.gif 
+First path component :  templates 
+Last path component :  module_heading.gif
+
+Path :  /templates/jp_hotel/images/logo.jpg 
+First path component :  templates 
+Last path component :  logo.jpg
+
+Path :  /templates/jp_hotel/images/content_heading.gif 
+First path component :  templates 
+Last path component :  content_heading.gif
+
+Path :  /templates/jp_hotel/css/template.css 
+First path component :  templates 
+Last path component :  template.css
+
+Path :  /templates/jp_hotel/css/suckerfish.css 
+First path component :  templates 
+Last path component :  suckerfish.css
+
+Path :  /templates/jp_hotel/css/menu.css 
+First path component :  templates 
+Last path component :  menu.css
+
+Path :  /templates/jp_hotel/css/layout.css 
+First path component :  templates 
+Last path component :  layout.css
+
+
+
+
+
+1.f) Print the mean and mode of the distribution of number of GET params
+
+##Script(mean)
+
+grep GET http.log | awk '{ print $7 }' | grep "?" | sed 's/\/.*?//' | awk -F '[&]' '{ print NF }' | awk '{ sum = sum + $1; } END { print "mean = ", sum / NR }'
+
+##Output
+
+mean =  2.92094
+
+##Script(mode)
+
+grep GET http.log | awk '{ print $7 }' | grep "?" | sed 's/\/.*?//' | awk -F '[&]' '{ print NF }' | sort | uniq -c | sort -nr | head -1 | awk '{ print "mode = ", $2 }'
+
+##Output
+
+mode =  3
+
+
+
+
+
+2. Implement a shell script that interleaves non-blank lines from each of its input text files.
+
+##Script
+
+case "$#" in
+        0|1|2)  echo 'Usage : interleave_lines n file1 file2 [ file3 ... ]' 1>&2; exit 1 ;;
+esac
+
+n="$1"
+shift
+
+for file in "$@"
+do
+        if [ ! -f $file ]
+        then
+                echo "File '$file' does not exist"
+                exit 1
+        fi  
+done
+
+paste_command=""
+
+for file in "$@"; do
+    awk 'NF' $file | awk -v val="$n" '{ORS=(NR%val==0)?"\n":" dfhi54y4uc98u49q ";}1'  > "temp_$file"
+    paste_command+=" temp_$file"
+done
+
+paste -d '\n' $paste_command | sed 's/ dfhi54y4uc98u49q /\n/g' | awk 'NF'
+
+for file in "$@"
+do
+    rm "temp_$file"
+done
+
+
+##Command
+
+./interleave_lines 3 a.txt b.txt c.txt
+
+
+##Output
+
+line 1 file a
+	line 2 file a
+line 3 file a
+line 1 of b
+     line 2 of b
+line 3 of b
+line 1 of c
+	line 2 of c
+line 3 of c
+		line 4 file a
+line 5 file a
+line 4 of b
+line 5 of b
+		line 6 of b
+		line 4 of c
+line 5 of c
+line 6 of c
+line 7 of b
+line 7 of c
+line 8 of c
+line 9 of c
+
+##files
+
+#a.txt
+line 1 file a
+
+
+
+        line 2 file a
+
+
+
+line 3 file a
+
+
+
+                line 4 file a
+
+
+line 5 file a
+
+#b.txt
+
+
+line 1 of b
+     line 2 of b
+
+
+line 3 of b
+ 
+line 4 of b
+
+
+line 5 of b
+                line 6 of b
+line 7 of b
+
+#c.txt
+line 1 of c
+        line 2 of c
+
+
+line 3 of c
+
+                line 4 of c
+
+
+line 5 of c
+
+line 6 of c
+
+
+line 7 of c
+
+line 8 of c
+
+
+line 9 of c
+
+
