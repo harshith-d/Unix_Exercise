@@ -1,0 +1,5 @@
+##1.e) Print the first & last path name components of top-10 most frequently accessed resources
+
+##Script
+
+awk '{ print $7 }' test.log | grep "/.*/.*" | sed 's/?.*//' | awk -F/ '{print $0,$2,$NF}' | sort | uniq -c | sort -rn | head -n 10 | awk '{print "\nPath : ",$2 , "\nFirst path component : ", $3, "\nLast path component : ", $4}'
